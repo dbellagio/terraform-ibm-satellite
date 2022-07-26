@@ -73,7 +73,7 @@ variable "cp_hosts" {
   )
   default = [
     {
-      instance_type = "n2-standard-4"
+      instance_type = "n2-highmem-4"
       count         = 3
     }
   ]
