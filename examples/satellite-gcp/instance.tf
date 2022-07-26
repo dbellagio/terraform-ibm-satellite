@@ -92,6 +92,20 @@ module "gcp_firewall-rules" {
   ]
   depends_on = [module.gcp_subnets]
 }
+resource "google_compute_router" "nat-router" {
+  name    = "sat-nat-router"
+  region  = var.gcp_region
+  network = module.gcp_network.network_name
+}
+
+resource "google_compute_router_nat" "nat-config" {
+  name                               = "sat-nat-config"
+  router                             = google_compute_router.nat-router.name
+  region                             = var.gcp_region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+}
+
 
 ##########################################################
 # GCP Compute Template and Instances
@@ -128,10 +142,6 @@ module "gcp_host-template" {
   disk_labels = {
     ibm-satellite = var.gcp_resource_prefix
   }
-  access_config = [{
-    nat_ip       = null
-    network_tier = "PREMIUM"
-  }]
   auto_delete     = true
   service_account = { email = "", scopes = [] }
   depends_on      = [module.satellite-location, module.gcp_firewall-rules]
@@ -146,8 +156,4 @@ module "gcp_hosts" {
   num_instances      = each.value.count
   hostname           = "${var.gcp_resource_prefix}-host-${each.key}"
   instance_template  = module.gcp_host-template[each.key].self_link
-  access_config = [{
-    nat_ip       = null
-    network_tier = "PREMIUM"
-  }]
 }

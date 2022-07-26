@@ -1,4 +1,3 @@
-
 # # ##################################################
 # # # GCP and IBM Authentication Variables
 # # ##################################################
@@ -6,24 +5,27 @@
 variable "gcp_project" {
   description = "GCP Project ID"
   type        = string
+  default     = "was-it-project-6305"
 }
 variable "gcp_region" {
   description = "Google Region"
   type        = string
-  default     = "us-east1"
+  default     = "us-central1"
 }
 variable "gcp_credentials" {
   description = "Either the path to or the contents of a service account key file in JSON format."
   type        = string
+  default     = "./serviceKey.json"
 }
 variable "ibmcloud_api_key" {
   description = "IBM Cloud API Key"
   type        = string
+  default     = "<fill out with your api key>"
 }
 variable "ibm_resource_group" {
   description = "Resource group name of the IBM Cloud account."
   type        = string
-  default     = "default"
+  default     = "Cloud Satellite Test"
 }
 
 # # ##################################################
@@ -144,18 +146,18 @@ variable "is_location_exist" {
 variable "managed_from" {
   description = "The IBM Cloud region to manage your Satellite location from. Choose a region close to your on-prem data center for better performance."
   type        = string
-  default     = "wdc"
+  default     = "dal"
 }
 
 variable "location_zones" {
   description = "Allocate your hosts across these three zones"
   type        = list(string)
-  default     = ["us-east1-b", "us-east1-c", "us-east1-d"]
+  default     = ["us-central1-a", "us-central1-b", "us-central1-c"]
 }
 
 variable "location_bucket" {
   description = "COS bucket name"
-  default     = ""
+  default     = "satellite.config.kbna.central"
 }
 
 variable "host_labels" {
