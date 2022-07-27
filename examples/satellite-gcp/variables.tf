@@ -7,6 +7,19 @@ variable "gcp_project" {
   type        = string
   default     = "was-it-project-6305"
 }
+
+variable "gcp_shared_network" {
+  description = "GCP Shared VPC Network (rather than creating your owm VPC)"
+  type        = string
+  default     = "network-np-uscentral1-shared"
+}
+
+variable "gcp_subnet" {
+  description = "GCP selflink to the subnet"
+  type        = string
+  default     = "projects/gcp-sharedhost-np-7626/regions/us-central1/subnetworks/subnet-np-uscentral1-was-it-nodes"
+}
+
 variable "gcp_region" {
   description = "Google Region"
   type        = string
