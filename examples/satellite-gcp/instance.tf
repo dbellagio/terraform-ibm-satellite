@@ -5,107 +5,12 @@ module "gcp_network" {
   source          = "terraform-google-modules/network/google//modules/vpc"
   version         = "~> 3.3.0"
   project_id      = var.gcp_project
-  network_name    = "${var.gcp_resource_prefix}-vpc"
+#  network_name    = "${var.gcp_resource_prefix}-vpc"
+  network_name    = "${var.gcp_shared_network}"
   shared_vpc_host = false
 }
-module "gcp_subnets" {
-  source  = "terraform-google-modules/network/google//modules/subnets"
-  version = "3.3.0"
 
-  project_id   = var.gcp_project
-  network_name = module.gcp_network.network_name
-  subnets = [
-    {
-      subnet_name   = "${var.gcp_resource_prefix}-subnet"
-      subnet_ip     = "10.0.0.0/16"
-      subnet_region = var.gcp_region
-    }
-  ]
-}
-module "gcp_firewall-rules" {
-  source       = "terraform-google-modules/network/google//modules/firewall-rules"
-  version      = "3.3.0"
-  project_id   = var.gcp_project
-  network_name = module.gcp_network.network_name
-  rules = [
-    {
-      name                    = "${var.gcp_resource_prefix}-ingress"
-      description             = "Ingress for ${var.gcp_resource_prefix}-vpc"
-      direction               = "INGRESS"
-      priority                = 1000
-      ranges                  = ["0.0.0.0/0"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = []
-      target_service_accounts = null
-      allow = [
-        {
-          protocol = "tcp"
-          ports    = ["30000-32767"]
-        },
-        {
-          protocol = "udp"
-          ports    = ["30000-32767"]
-        }
-      ]
-      deny       = []
-      log_config = null
-    },
-    {
-      name                    = "${var.gcp_resource_prefix}-egress"
-      description             = "Egress rules for ${var.gcp_resource_prefix}-vpc"
-      direction               = "EGRESS"
-      priority                = 1000
-      ranges                  = ["0.0.0.0/0"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = []
-      target_service_accounts = null
-      allow = [
-        {
-          protocol = "all"
-          ports    = []
-        }
-      ]
-      deny       = []
-      log_config = null
-    },
-    {
-      name                    = "${var.gcp_resource_prefix}-private-ingress"
-      description             = "Private Ingress rules for ${var.gcp_resource_prefix}-vpc"
-      direction               = "INGRESS"
-      priority                = 1000
-      ranges                  = ["10.0.0.0/16"]
-      source_tags             = null
-      source_service_accounts = null
-      target_tags             = []
-      target_service_accounts = null
-      allow = [
-        {
-          protocol = "all"
-          ports    = []
-        }
-      ]
-      deny       = []
-      log_config = null
-    },
-  ]
-  depends_on = [module.gcp_subnets]
-}
-resource "google_compute_router" "nat-router" {
-  name    = "sat-nat-router"
-  region  = var.gcp_region
-  network = module.gcp_network.network_name
-}
-
-resource "google_compute_router_nat" "nat-config" {
-  name                               = "sat-nat-config"
-  router                             = google_compute_router.nat-router.name
-  region                             = var.gcp_region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-}
-
+# Deleted sections to create VPC, subnets, router, NAT
 
 ##########################################################
 # GCP Compute Template and Instances
@@ -121,7 +26,8 @@ module "gcp_host-template" {
   version    = "6.5.0"
   project_id = var.gcp_project
   # network     = module.gcp_network.network_name
-  subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
+  # subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
+  subnetwork         = var.gcp_subnet
   subnetwork_project = var.gcp_project
   name_prefix        = "${var.gcp_resource_prefix}-template"
   tags               = ["ibm-satellite", var.gcp_resource_prefix]
@@ -144,7 +50,9 @@ module "gcp_host-template" {
   }
   auto_delete     = true
   service_account = { email = "", scopes = [] }
-  depends_on      = [module.satellite-location, module.gcp_firewall-rules]
+#  depends_on      = [module.satellite-location, module.gcp_firewall-rules]
+  depends_on      = [module.satellite-location]
+
 }
 module "gcp_hosts" {
   for_each           = local.hosts
@@ -152,7 +60,8 @@ module "gcp_hosts" {
   region             = var.gcp_region
   network            = module.gcp_network.network_name
   subnetwork_project = var.gcp_project
-  subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
+#  subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
+  subnetwork         = var.gcp_subnet
   num_instances      = each.value.count
   hostname           = "${var.gcp_resource_prefix}-host-${each.key}"
   instance_template  = module.gcp_host-template[each.key].self_link
