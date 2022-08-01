@@ -1,13 +1,13 @@
 ##########################################################
 # GCP network, subnetwork and its firewall rules
 ##########################################################
-module "gcp_network" {
-  source          = "terraform-google-modules/network/google//modules/vpc"
-  version         = "~> 3.3.0"
-  project_id      = var.gcp_project
-#  network_name    = "${var.gcp_resource_prefix}-vpc"
-  network_name    = "${var.gcp_shared_network}"
-  shared_vpc_host = false
+
+# define this structure and attempt to import using Terraform command
+# from this url -> https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network
+# terraform import google_compute_network.test projects/gcp-sharedhost-np-7626/global/networks/network-np-uscentral1-shared
+
+resource "google_compute_network" "test" {
+  
 }
 
 # Deleted sections to create VPC, subnets, router, NAT
@@ -25,7 +25,7 @@ module "gcp_host-template" {
   source     = "terraform-google-modules/vm/google//modules/instance_template"
   version    = "6.5.0"
   project_id = var.gcp_project
-  # network     = module.gcp_network.network_name
+  network     = google_compute_network.test.name
   # subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
   subnetwork         = var.gcp_subnet
   subnetwork_project = var.gcp_project
@@ -58,7 +58,7 @@ module "gcp_hosts" {
   for_each           = local.hosts
   source             = "terraform-google-modules/vm/google//modules/compute_instance"
   region             = var.gcp_region
-  network            = module.gcp_network.network_name
+  network            = google_compute_network.test.name
   subnetwork_project = var.gcp_project
 #  subnetwork         = module.gcp_subnets.subnets["${var.gcp_region}/${var.gcp_resource_prefix}-subnet"].self_link
   subnetwork         = var.gcp_subnet
