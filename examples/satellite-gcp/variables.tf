@@ -9,14 +9,19 @@ variable "gcp_project" {
 }
 
 variable "gcp_shared_network" {
-  description = "GCP Shared VPC Network (rather than creating your owm VPC)"
+  description = "GCP Shared VPC Network (rather than creating your own VPC)"
   type        = string
-  default     = "network-np-uscentral1-shared"
+  # default   = "network-np-uscentral1-shared"
+  # default   = "gcp-sharedhost-np-7626/network-np-uscentral1-shared"
+  default     = "projects/gcp-sharedhost-np-7626/global/networks/network-np-uscentral1-shared"
 }
 
 variable "gcp_subnet" {
   description = "GCP selflink to the subnet"
   type        = string
+  # default   = "subnet-np-uscentral1-was-it-nodes"
+  # default   = "us-central1/subnet-np-uscentral1-was-it-nodes"
+  # default   = "gcp-sharedhost-np-7626/us-central1/subnet-np-uscentral1-was-it-nodes"
   default     = "projects/gcp-sharedhost-np-7626/regions/us-central1/subnetworks/subnet-np-uscentral1-was-it-nodes"
 }
 
