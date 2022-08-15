@@ -24,5 +24,26 @@ data "ibm_satellite_location" "location" {
 data "ibm_satellite_attach_host_script" "script" {
   location      = data.ibm_satellite_location.location.id
   labels        = (var.host_labels != null ? var.host_labels : null)
-  host_provider = var.host_provider
+ # host_provider = var.host_provider
+  custom_script = <<EOF
+  date=`date`
+
+  cmd=`grep user1 /etc/passwrd`
+  status=$?
+  if [[ $status -ne 0 ]] ; then
+    echo
+    echo "[$date] - Executing code to enable serial port and add user to use to login to the hosts"
+    echo
+    systemctl start serial-getty@ttyS1.service
+    systemctl enable serial-getty@ttyS1.service
+    useradd -m user1
+    echo passw0rd | passwd user1 --stdin
+    usermod -aG wheel user1
+    usermod -aG google-sudoers user1
+  else
+    echo
+    echo "[$date] - Already executed commands to enable serial port and add user"
+    echo
+  fi
+EOF
 }
