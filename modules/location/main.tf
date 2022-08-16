@@ -32,17 +32,27 @@ data "ibm_satellite_attach_host_script" "script" {
   status=$?
   if [[ $status -ne 0 ]] ; then
     echo
-    echo "[$date] - Executing code to enable serial port and add user to use to login to the hosts"
+    echo "[$date] - Executing code to enable serial port, add RHEL package updates, and add a user to use to login to the hosts"
     echo
+
+    # Turn on serial port and enable
     systemctl start serial-getty@ttyS1.service
     systemctl enable serial-getty@ttyS1.service
+
+    # Add user to login to host as (change password if needed)
     useradd -m user1
     echo passw0rd | passwd user1 --stdin
     usermod -aG wheel user1
     usermod -aG google-sudoers user1
+
+    # Enable GCP RHEL package updates
+    yum update --disablerepo=* --enablerepo="*" -y
+    yum repolist all
+    yum install container-selinux -y
+    yum install subscription-manager -y
   else
     echo
-    echo "[$date] - Already executed commands to enable serial port and add user"
+    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user"
     echo
   fi
 EOF
