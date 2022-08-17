@@ -28,7 +28,7 @@ data "ibm_satellite_attach_host_script" "script" {
   custom_script = <<EOF
   date=`date`
 
-  cmd=`grep user1 /etc/passwrd`
+  cmd=`grep user1 /etc/passwd`
   status=$?
   if [[ $status -ne 0 ]] ; then
     echo
