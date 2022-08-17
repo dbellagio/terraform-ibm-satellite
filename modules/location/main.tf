@@ -26,11 +26,13 @@ data "ibm_satellite_attach_host_script" "script" {
   labels        = (var.host_labels != null ? var.host_labels : null)
  # host_provider = var.host_provider
   custom_script = <<EOF
+  set +e
   date=`date`
 
   cmd=`grep user1 /etc/passwd`
   status=$?
-  if [[ $status -ne 0 ]] ; then
+  if [ $status -ne 0 ]
+  then
     echo
     echo "[$date] - Executing code to enable serial port, add RHEL package updates, and add a user to use to login to the hosts"
     echo
@@ -55,5 +57,6 @@ data "ibm_satellite_attach_host_script" "script" {
     echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user"
     echo
   fi
+  set -e
 EOF
 }
