@@ -47,10 +47,14 @@ data "ibm_satellite_attach_host_script" "script" {
     usermod -aG wheel user1
     usermod -aG google-sudoers user1
 
+    # move un-needed repos out of the way so yum commands do not fail
+    mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.BAK
+    mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.BAK
+    
     # Enable GCP RHEL package updates
     yum update --disablerepo=* --enablerepo="*" -y
     yum repolist all
-    yum install container-selinux -y
+    # yum install container-selinux -y
     yum install subscription-manager -y
   else
     echo
