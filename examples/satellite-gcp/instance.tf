@@ -12,6 +12,7 @@ resource "tls_private_key" "rsa_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
+
 module "gcp_host-template" {
   for_each   = local.hosts
   source     = "terraform-google-modules/vm/google//modules/instance_template"
@@ -41,10 +42,11 @@ module "gcp_host-template" {
   }
   auto_delete     = true
   service_account = { email = "", scopes = [] }
-#  depends_on      = [module.satellite-location, module.gcp_firewall-rules]
+  additional_disks     = each.value.additional_disks
   depends_on      = [module.satellite-location]
 
 }
+
 module "gcp_hosts" {
   for_each           = local.hosts
   source             = "terraform-google-modules/vm/google//modules/compute_instance"

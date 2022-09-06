@@ -46,6 +46,12 @@ variable "ibm_resource_group" {
   default     = "Cloud Satellite Test"
 }
 
+variable "worker_odf_disk_size" {
+  description = "Size of ODF data disk to attach"
+  type        = number
+  default     = 1800
+}
+
 # # ##################################################
 # # # Google Resources Variables
 # # ##################################################
@@ -121,7 +127,12 @@ variable "addl_hosts" {
       }
     )
   )
-  default = []
+  default = [
+    {
+      instance_type = "n2-standard-8"
+      count         = 5
+    }
+  ]
   validation {
     condition     = ! contains([for host in var.addl_hosts : (host.count > 0)], false)
     error_message = "All hosts must have a count of at least 1."
@@ -148,7 +159,7 @@ variable "gcp_ssh_user" {
 
 variable "location" {
   description = "Location Name"
-  default     = "satellite-gcp"
+  default     = "satellite-was-gcp"
 
   validation {
     condition     = var.location != "" && length(var.location) <= 32
