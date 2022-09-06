@@ -6,11 +6,33 @@ locals {
       instance_type     = var.instance_type
       count             = var.satellite_host_count
       for_control_plane = true
+      additional_disks = []
     }
     1 = {
       instance_type     = var.instance_type
       count             = var.addl_host_count
       for_control_plane = false
+        additional_disks = [{
+            mode = "READ_WRITE"
+            disk_type = "pd-balanced"
+            disk_size_gb = 100
+            type = "PERSISTENT"
+            boot = false
+            auto_delete = true
+            device_name = "forroks"
+            disk_name = "forroks"
+            disk_labels = {type = "forroks"}
+          },{
+            mode = "READ_WRITE"
+            disk_type = "pd-balanced"
+            disk_size_gb = var.worker_odf_disk_size
+            type = "PERSISTENT"
+            boot = false
+            auto_delete = true
+            device_name = "osd"
+            disk_name = "osd"
+            disk_labels = {type = "osd"}
+          }]
     }
     } : merge({
       for i, host in var.cp_hosts :
@@ -18,6 +40,7 @@ locals {
         instance_type     = host.instance_type
         count             = host.count
         for_control_plane = true
+        additional_disks = []
       }
       }, {
       for i, host in var.addl_hosts :
@@ -25,6 +48,27 @@ locals {
         instance_type     = host.instance_type
         count             = host.count
         for_control_plane = false
+        additional_disks = [{
+            mode = "READ_WRITE"
+            disk_type = "pd-balanced"
+            disk_size_gb = 100
+            type = "PERSISTENT"
+            boot = false
+            auto_delete = true
+            device_name = "forroks"
+            disk_name = "forroks"
+            disk_labels = {type = "forroks"}
+          },{
+            mode = "READ_WRITE"
+            disk_type = "pd-balanced"
+            disk_size_gb = var.worker_odf_disk_size
+            type = "PERSISTENT"
+            boot = false
+            auto_delete = true
+            device_name = "osd"
+            disk_name = "osd"
+            disk_labels = {type = "osd"}
+          }]
       }
   })
 }
