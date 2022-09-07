@@ -124,13 +124,40 @@ variable "addl_hosts" {
       {
         instance_type = string
         count         = number
+        zone          = string
       }
     )
   )
   default = [
     {
-      instance_type = "n2-standard-8"
-      count         = 6
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-a"
+    },
+    {
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-b"
+    },
+    {
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-c"
+    },
+    {
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-a"
+    },
+    {
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-b"
+    },
+    {
+      instance_type   = "n2-standard-8"
+      count           = 1
+      zone            = "us-central1-c"
     }
   ]
   validation {
