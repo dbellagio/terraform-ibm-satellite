@@ -1,4 +1,9 @@
 locals {
+
+  unique_name = "${lower(var.gcp_resource_prefix)}-${lower(random_id.id.hex)}"
+  disk_forroks = "${local.unique_name}-forroks"
+  disk_osd = "${local.unique_name}-osd"
+
   # combine cp_hosts and addl_hosts into a map so we can use for_each later
   # support backwards compatibility with providing var.instance_type, satellite_host_count, and addl_host_count
   hosts = (var.satellite_host_count != null && var.addl_host_count != null && var.instance_type != null) ? {
@@ -19,8 +24,8 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "forroks"
-            disk_name = "forroks"
+            device_name = "${local.disk_forroks}"
+            disk_name = "${local.disk_forroks}"
             disk_labels = {type = "forroks"}
           },{
             mode = "READ_WRITE"
@@ -29,8 +34,8 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "osd"
-            disk_name = "osd"
+            device_name = "${local.disk_osd}"
+            disk_name = "${local.disk_osd}"
             disk_labels = {type = "osd"}
           }]
     }
@@ -55,8 +60,8 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "forroks"
-            disk_name = "forroks"
+            device_name = "${local.disk_forroks}-${i}"
+            disk_name = "${local.disk_forroks}-${i}"
             disk_labels = {type = "forroks"}
           },{
             mode = "READ_WRITE"
@@ -65,10 +70,14 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "osd"
-            disk_name = "osd"
+            device_name = "${local.disk_osd}-${i}"
+            disk_name = "${local.disk_osd}-${i}"
             disk_labels = {type = "osd"}
           }]
       }
   })
+}
+
+resource "random_id" "id" {
+  byte_length = 2
 }

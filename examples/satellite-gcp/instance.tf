@@ -56,4 +56,5 @@ module "gcp_hosts" {
   num_instances      = each.value.count
   hostname           = "${var.gcp_resource_prefix}-host-${each.key}"
   instance_template  = module.gcp_host-template[each.key].self_link
+  zone               = var.location_zones != null ? element(var.location_zones, each.key) : null
 }
