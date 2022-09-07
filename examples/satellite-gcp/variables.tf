@@ -130,7 +130,7 @@ variable "addl_hosts" {
   default = [
     {
       instance_type = "n2-standard-8"
-      count         = 5
+      count         = 6
     }
   ]
   validation {
