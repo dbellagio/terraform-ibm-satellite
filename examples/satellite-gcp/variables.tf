@@ -5,7 +5,6 @@
 variable "gcp_project" {
   description = "GCP Project ID"
   type        = string
-  default     = "was-it-project-6305"
 }
 
 variable "gcp_shared_network" {
@@ -13,7 +12,6 @@ variable "gcp_shared_network" {
   type        = string
   # default   = "network-np-uscentral1-shared"
   # default   = "gcp-sharedhost-np-7626/network-np-uscentral1-shared"
-  default     = "projects/gcp-sharedhost-np-7626/global/networks/network-np-uscentral1-shared"
 }
 
 variable "gcp_subnet" {
@@ -22,28 +20,25 @@ variable "gcp_subnet" {
   # default   = "subnet-np-uscentral1-was-it-nodes"
   # default   = "us-central1/subnet-np-uscentral1-was-it-nodes"
   # default   = "gcp-sharedhost-np-7626/us-central1/subnet-np-uscentral1-was-it-nodes"
-  default     = "projects/gcp-sharedhost-np-7626/regions/us-central1/subnetworks/subnet-np-uscentral1-was-it-nodes"
 }
 
 variable "gcp_region" {
   description = "Google Region"
   type        = string
-  default     = "us-central1"
+  default     = "us-east1"
 }
 variable "gcp_credentials" {
   description = "Either the path to or the contents of a service account key file in JSON format."
   type        = string
-  default     = "./serviceKey.json"
 }
 variable "ibmcloud_api_key" {
   description = "IBM Cloud API Key"
   type        = string
-  default     = "<fill out with your api key>"
 }
 variable "ibm_resource_group" {
   description = "Resource group name of the IBM Cloud account."
   type        = string
-  default     = "Cloud Satellite Test"
+  default     = "default"
 }
 
 variable "worker_odf_disk_size" {
@@ -128,38 +123,7 @@ variable "addl_hosts" {
       }
     )
   )
-  default = [
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-a"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-b"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-c"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-a"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-b"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-c"
-    }
-  ]
+  default = []
   validation {
     condition     = ! contains([for host in var.addl_hosts : (host.count > 0)], false)
     error_message = "All hosts must have a count of at least 1."
@@ -186,7 +150,7 @@ variable "gcp_ssh_user" {
 
 variable "location" {
   description = "Location Name"
-  default     = "satellite-was-gcp"
+  default     = "satellite-gcp"
 
   validation {
     condition     = var.location != "" && length(var.location) <= 32
@@ -202,18 +166,19 @@ variable "is_location_exist" {
 variable "managed_from" {
   description = "The IBM Cloud region to manage your Satellite location from. Choose a region close to your on-prem data center for better performance."
   type        = string
-  default     = "dal"
+  default     = "wdc"
 }
 
 variable "location_zones" {
   description = "Allocate your hosts across these three zones"
   type        = list(string)
-  default     = ["us-central1-a", "us-central1-b", "us-central1-c"]
+  default     = ["us-east1-b", "us-east1-c", "us-east1-d"]
 }
 
 variable "location_bucket" {
   description = "COS bucket name"
-  default     = "satellite.config.kbna.central"
+  type        = string
+  default     = ""
 }
 
 variable "host_labels" {
