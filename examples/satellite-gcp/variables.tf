@@ -85,6 +85,8 @@ variable "instance_type" {
   type        = string
   default     = null
 }
+
+# There is a bug with Google zones.  This below code works with a count of 3, if you go above 3 hosts will be created in other zones (zone f)
 variable "cp_hosts" {
   description = "A map of GCP host objects used to create the location control plane, including instance_type and count. Control plane count value should always be in multiples of 3, such as 3, 6, 9, or 12 hosts."
   type = list(
@@ -117,6 +119,40 @@ variable "cp_hosts" {
   }
 }
 
+# There is a bug with Google zones.  This below code works with a count of 3, if you go above 3 hosts will be created in other zones (zone f)
+variable "storage_hosts" {
+  description = "A map of GCP host objects used to create storage hosts and attach to location, including instance_type and count."
+  type = list(
+    object(
+      {
+        instance_type = string
+        count         = number
+      }
+    )
+  )
+  default = [
+    {
+      instance_type = "n2-standard-16"
+      count         = 3
+    }
+  ]
+
+  validation {
+    condition     = ! contains([for host in var.storage_hosts : (host.count > 0)], false)
+    error_message = "All hosts must have a count of at least 1."
+  }
+  validation {
+    condition     = ! contains([for host in var.storage_hosts : (host.count % 3 == 0)], false)
+    error_message = "Count value for all hosts should always be in multiples of 3, such as 6, 9, or 12 hosts."
+  }
+
+  validation {
+    condition     = can([for host in var.storage_hosts : host.instance_type])
+    error_message = "Each object should have an instance_type."
+  }
+}
+
+# There is a bug with Google zones.  This below code works with a any number of hosts as we hardcode the zones
 variable "addl_hosts" {
   description = "A list of GCP host objects used for provisioning services on your location after setup, including instance_type and count."
   type = list(
@@ -129,21 +165,6 @@ variable "addl_hosts" {
     )
   )
   default = [
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-a"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-b"
-    },
-    {
-      instance_type   = "n2-standard-8"
-      count           = 1
-      zone            = "us-central1-c"
-    },
     {
       instance_type   = "n2-standard-8"
       count           = 1
@@ -175,6 +196,7 @@ variable "ssh_public_key" {
   type        = string
   default     = null
 }
+
 variable "gcp_ssh_user" {
   description = "SSH User of above provided ssh_public_key"
   type        = string
