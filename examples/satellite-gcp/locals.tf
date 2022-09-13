@@ -2,37 +2,25 @@ locals {
 
   # combine cp_hosts and addl_hosts into a map so we can use for_each later
   # support backwards compatibility with providing var.instance_type, satellite_host_count, and addl_host_count
-  hosts = (var.satellite_host_count != null && var.addl_host_count != null && var.instance_type != null) ? {
-    0 = {
-      instance_type     = var.instance_type
-      count             = var.satellite_host_count
-      for_control_plane = true
-      additional_disks  = []
-      zone              = null
-    }
-    1 = {
-      instance_type     = var.instance_type
-      count             = var.addl_host_count
-      for_control_plane = false
-      additional_disks  = []
-      zone              = null
-    }
-    } : merge({
-      for i, host in var.cp_hosts :
+
+  # removed the backward compatibility code as it was more confusing and we are not using it
+  hosts = merge({
+      for i, host_cp in var.cp_hosts :
       i => {
-        instance_type     = host.instance_type
-        count             = host.count
+        instance_type     = host_cp.instance_type
+        count             = host_cp.count
         for_control_plane = true
         additional_disks  = []
         zone              = null
       }
       }, {
-      for i, host in var.addl_hosts :
-      sum([i, length(var.cp_hosts)]) => {
-        instance_type     = host.instance_type
-        count             = host.count
+      for s, host_storage in var.storage_hosts :
+      sum([s, length(var.cp_hosts)]) => {
+        instance_type     = host_storage.instance_type
+        count             = host_storage.count
         for_control_plane = false
-        zone              = host.zone
+        # zone = null only works if we are doing 3 in the GCP zones where they have more that 3 zones available
+        zone              = null
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"
@@ -40,8 +28,9 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "${var.gcp_resource_prefix}-roks-host-${i + 1}"
-            disk_name = "${var.gcp_resource_prefix}-roks-host-${i + 1}"
+            # these device names need to be unique for GCP project in each zone
+            device_name = "${var.gcp_resource_prefix}-roks-host-${s + 1}"
+            disk_name = "${var.gcp_resource_prefix}-roks-host-${s + 1}"
             disk_labels = {type = "forroks"}
           },{
             mode = "READ_WRITE"
@@ -50,10 +39,32 @@ locals {
             type = "PERSISTENT"
             boot = false
             auto_delete = true
-            device_name = "${var.gcp_resource_prefix}-osd-host-${i + 1}"
-            disk_name = "${var.gcp_resource_prefix}-osd-host-${i + 1}"
+            # these device names need to be unique for GCP project in each zone
+            device_name = "${var.gcp_resource_prefix}-osd-host-${s + 1}"
+            disk_name = "${var.gcp_resource_prefix}-osd-host-${s + 1}"
             disk_labels = {type = "osd"}
           }]
+      }
+      }, {
+      for j, host_addl in var.addl_hosts :
+      sum([j, length(var.cp_hosts), length(var.storage_hosts)]) => {
+        instance_type     = host_addl.instance_type
+        count             = host_addl.count
+        for_control_plane = false
+        # get the zone from the structure as this structure hard codes zone to work around host number being greater than 3
+        zone              = host_addl.zone
+        additional_disks = [{
+            mode = "READ_WRITE"
+            disk_type = "pd-balanced"
+            disk_size_gb = 100
+            type = "PERSISTENT"
+            boot = false
+            auto_delete = true
+            # these device names need to be unique for GCP project in each zone
+            device_name = "${var.gcp_resource_prefix}-roks-host-${j + 1 + length(var.storage_hosts)}"
+            disk_name = "${var.gcp_resource_prefix}-roks-host-${j + 1 + length(var.storage_hosts)}"
+            disk_labels = {type = "forroks"}
+        }]
       }
   })
 }
