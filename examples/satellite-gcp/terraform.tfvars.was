@@ -3,14 +3,10 @@ gcp_shared_network = "projects/gcp-sharedhost-np-7626/global/networks/network-np
 gcp_subnet = "projects/gcp-sharedhost-np-7626/regions/us-central1/subnetworks/subnet-np-uscentral1-was-it-nodes"
 gcp_region = "us-central1"
 gcp_credentials = "./serviceKey.json"
+ibmcloud_api_key = "<your IBM Cloud API Key>"
 ibm_resource_group = "Cloud Satellite Test"
 worker_odf_disk_size = 1800
 gcp_resource_prefix = "satellite-google"
-location = "satellite-was-gcp"
-managed_from = "dal"
-location_zones = ["us-central1-a", "us-central1-b", "us-central1-c"]
-location_bucket = "satellite.config.kbna.central"
-host_labels = ["env:prod"]
 
 cp_hosts = [
     {
@@ -43,3 +39,12 @@ addl_hosts = [
       zone            = "us-central1-c"
     }
 ]
+
+location = "satellite-was-gcp"
+is_location_exist = false
+managed_from = "dal"
+location_zones = ["us-central1-a", "us-central1-b", "us-central1-c"]
+location_bucket = "satellite.config.kbna.central"
+host_labels = ["env:prod"]
+worker_image_project = "rhel-cloud"
+worker_image_family = "rhel-7"
