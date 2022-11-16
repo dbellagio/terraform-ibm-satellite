@@ -142,6 +142,17 @@ variable "addl_hosts" {
   }
 }
 
+variable "worker_image_sku" {
+  description = "Operating system image SKU for the workers created"
+  type        = string
+  default     = "7-LVM"
+}
+
+variable "worker_image_version" {
+  description = "Operating system image version for the workers created"
+  type        = string
+  default     = "latest"
+}
 # ##################################################
 # # IBM CLOUD Satellite Location Variables
 # ##################################################
@@ -196,7 +207,7 @@ variable "host_labels" {
 variable "create_cluster" {
   description = "Create Cluster: Disable this, not to provision cluster"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "cluster" {
@@ -212,7 +223,7 @@ variable "cluster" {
 
 variable "kube_version" {
   description = "Satellite Kube Version"
-  default     = "4.10.9_openshift"
+  default     = "4.10_openshift"
 }
 
 variable "worker_count" {

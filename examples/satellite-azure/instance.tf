@@ -30,6 +30,7 @@ data "azurerm_resource_group" "resource_group" {
 //Module to create security group and security group rules
 module "network-security-group" {
   source                = "Azure/network-security-group/azurerm"
+  version               = "~> 3.6.0"
   resource_group_name   = data.azurerm_resource_group.resource_group.name
   location              = data.azurerm_resource_group.resource_group.location # Optional; if not provided, will use Resource Group location
   security_group_name   = "${var.az_resource_prefix}-sg"
@@ -70,6 +71,7 @@ module "network-security-group" {
 module "vnet" {
   depends_on          = [data.azurerm_resource_group.resource_group]
   source              = "Azure/vnet/azurerm"
+  version             = "2.7.0"
   resource_group_name = data.azurerm_resource_group.resource_group.name
   vnet_name           = "${var.az_resource_prefix}-vpc"
   address_space       = ["10.0.0.0/16"]
@@ -135,8 +137,8 @@ resource "azurerm_linux_virtual_machine" "az_host" {
   source_image_reference {
     publisher = "RedHat"
     offer     = "RHEL"
-    sku       = "7-LVM"
-    version   = "latest"
+    sku       = var.worker_image_sku
+    version   = var.worker_image_version
   }
 }
 resource "azurerm_managed_disk" "data_disk" {

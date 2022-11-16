@@ -1,6 +1,6 @@
-##########################################################
-# GCP network, subnetwork and its firewall rules
-##########################################################
+###############################################################################
+# GCP network, subnetwork and its firewall rules have been removed in this fork
+###############################################################################
 
 # Deleted sections to create VPC, subnets, router, NAT
 
@@ -33,8 +33,8 @@ module "gcp_host-template" {
   # startup_script=module.satellite-location.host_script
   machine_type         = each.value.instance_type
   can_ip_forward       = false
-  source_image_project = "rhel-cloud"
-  source_image_family  = "rhel-7"
+  source_image_project = var.worker_image_project
+  source_image_family  = var.worker_image_family
   disk_size_gb         = 100
   disk_type            = "pd-ssd"
   disk_labels = {
@@ -50,6 +50,7 @@ module "gcp_host-template" {
 module "gcp_hosts" {
   for_each           = local.hosts
   source             = "terraform-google-modules/vm/google//modules/compute_instance"
+  version            = "7.9.0"
   region             = var.gcp_region
   network            = var.gcp_shared_network
   subnetwork         = var.gcp_subnet
