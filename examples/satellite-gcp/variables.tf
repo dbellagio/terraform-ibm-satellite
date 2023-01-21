@@ -63,106 +63,116 @@ variable "gcp_resource_prefix" {
   }
 }
 
-variable "satellite_host_count" {
-  description = "The total number of GCP host to create for control plane. satellite_host_count value should always be in multiples of 3, such as 3, 6, 9, or 12 hosts"
-  type        = number
-  default     = null
-  validation {
-    condition     = var.satellite_host_count == null || ((can((var.satellite_host_count % 3) == 0)) && can(var.satellite_host_count > 0))
-    error_message = "Sorry, host_count value should always be in multiples of 3, such as 6, 9, or 12 hosts."
-  }
-}
-variable "addl_host_count" {
-  description = "The total number of additional gcp host"
-  type        = number
-  default     = null
-}
-variable "instance_type" {
-  description = "The type of gcp instance to start."
-  type        = string
-  default     = null
-}
-
-# There is a bug with Google zones.  This below code works with a count of 3, if you go above 3 hosts will be created in other zones (zone f)
+#------------------------------------------------------------------------------------------
+# There is a bug with Google zones if zone is left null and count was more than 3  
+# We now define each host in a variables file with zone specified 
+# we now only use count of 1 in the locals.tf file to allow for easy Terraform host removal
+#------------------------------------------------------------------------------------------
 variable "cp_hosts" {
-  description = "A map of GCP host objects used to create the location control plane, including instance_type and count. Control plane count value should always be in multiples of 3, such as 3, 6, 9, or 12 hosts."
+  description = "A map of GCP host objects used to create the location control plane, including instance_type, zone and a unique host id"
   type = list(
     object(
       {
-        instance_type = string
-        count         = number
+        instance_type  = string
+        zone           = string
+        unique_host_id = string
       }
     )
   )
   default = []
 
   validation {
-    condition     = ! contains([for host in var.cp_hosts : (host.count > 0)], false)
-    error_message = "All hosts must have a count of at least 1."
-  }
-  validation {
-    condition     = ! contains([for host in var.cp_hosts : (host.count % 3 == 0)], false)
-    error_message = "Count value for all hosts should always be in multiples of 3, such as 6, 9, or 12 hosts."
+    condition     = length(var.cp_hosts) % 3 == 0
+    error_message = "Control plane hosts should always be in multiples of 3, such as 6, 9, or 12 hosts."
   }
 
   validation {
     condition     = can([for host in var.cp_hosts : host.instance_type])
     error_message = "Each object should have an instance_type."
   }
+  validation {
+    condition     = can([for host in var.cp_hosts : host.zone])
+    error_message = "Each object should have a zone."
+  }
+  validation {
+    condition     = can([for host in var.cp_hosts : host.unique_host_id])
+    error_message = "Each object should have a unique_host_id."
+  }
+
 }
 
-# There is a bug with Google zones.  This below code works with a count of 3, if you go above 3 hosts will be created in other zones (zone f)
+#------------------------------------------------------------------------------------------
+# Same strategy as above but these hosts will have 2 disks added to them
+# one for OpenShift data, the otehr for ODF
+#------------------------------------------------------------------------------------------
 variable "storage_hosts" {
-  description = "A map of GCP host objects used to create storage hosts and attach to location, including instance_type and count."
+  description = "A map of GCP host objects used to create storage hosts and attach to location"
   type = list(
     object(
       {
-        instance_type = string
-        count         = number
+        instance_type   = string
+        zone            = string
+        unique_host_id  = string
       }
     )
   )
   default = []
 
   validation {
-    condition     = ! contains([for host in var.storage_hosts : (host.count > 0)], false)
-    error_message = "All hosts must have a count of at least 1."
-  }
-  validation {
-    condition     = ! contains([for host in var.storage_hosts : (host.count % 3 == 0)], false)
-    error_message = "Count value for all hosts should always be in multiples of 3, such as 6, 9, or 12 hosts."
+    condition     = length(var.storage_hosts) >= 3
+    error_message = "Storage hosts should have at least 3 hosts, one in each zone"
   }
 
   validation {
     condition     = can([for host in var.storage_hosts : host.instance_type])
     error_message = "Each object should have an instance_type."
   }
+  validation {
+    condition     = can([for host in var.storage_hosts : host.zone])
+    error_message = "Each object should have a zone."
+  }
+  validation {
+    condition     = can([for host in var.storage_hosts : host.unique_host_id])
+    error_message = "Each object should have a unique_host_id."
+  }
+
 }
 
-# There is a bug with Google zones.  This below code works with a any number of hosts as we hardcode the zones
+#------------------------------------------------------------------------------------------
+# Same strategy as above but these hosts will have 1 disk added to them
+# for OpenShift data
+#------------------------------------------------------------------------------------------
 variable "addl_hosts" {
   description = "A list of GCP host objects used for provisioning services on your location after setup, including instance_type and count."
   type = list(
     object(
       {
         instance_type = string
-        count         = number
-        zone          = string
+        zone            = string
+        unique_host_id  = string
       }
     )
   )
-
   default = []
 
   validation {
-    condition     = ! contains([for host in var.addl_hosts : (host.count > 0)], false)
-    error_message = "All hosts must have a count of at least 1."
+    condition     = length(var.addl_hosts) >= 3
+    error_message = "Additional hosts should have at least 3 hosts, one in each zone"
   }
 
   validation {
     condition     = can([for host in var.addl_hosts : host.instance_type])
     error_message = "Each object should have an instance_type."
   }
+  validation {
+    condition     = can([for host in var.addl_hosts : host.zone])
+    error_message = "Each object should have a zone."
+  }
+  validation {
+    condition     = can([for host in var.addl_hosts : host.unique_host_id])
+    error_message = "Each object should have a unique_host_id."
+  }
+
 }
 
 variable "ssh_public_key" {
@@ -218,7 +228,7 @@ variable "location_bucket" {
 variable "host_labels" {
   description = "Labels to add to attach host script"
   type        = list(string)
-  default     = ["env:dev"]
+  default     = []
 
   validation {
     condition     = can([for s in var.host_labels : regex("^[a-zA-Z0-9:]+$", s)])
@@ -235,7 +245,7 @@ variable "worker_image_project" {
 variable "worker_image_family" {
   description = "Operating system image family for the workers created"
   type        = string
-  default     = "rhel-7"
+  default     = "rhel-8"
 }
 
 variable "TF_VERSION" {

@@ -5,22 +5,21 @@ locals {
 
   # removed the backward compatibility code as it was more confusing and we are not using it
   hosts = merge({
-      for i, host_cp in var.cp_hosts :
-      i => {
+      for host_cp in var.cp_hosts :
+      host_cp.unique_host_id => {
         instance_type     = host_cp.instance_type
-        count             = host_cp.count
+        count             = 1
         for_control_plane = true
         additional_disks  = []
-        zone              = null
+        zone              = host_cp.zone
       }
       }, {
-      for s, host_storage in var.storage_hosts :
-      sum([s, length(var.cp_hosts)]) => {
+      for host_storage in var.storage_hosts :
+      host_storage.unique_host_id => {
         instance_type     = host_storage.instance_type
-        count             = host_storage.count
+        count             = 1
         for_control_plane = false
-        # zone = null only works if we are doing 3 in the GCP zones where they have more that 3 zones available
-        zone              = null
+        zone              = host_storage.zone
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"
@@ -29,8 +28,8 @@ locals {
             boot = false
             auto_delete = true
             # these device names need to be unique for GCP project in each zone
-            device_name = "${var.gcp_resource_prefix}-roks-host-${s + 1}"
-            disk_name = "${var.gcp_resource_prefix}-roks-host-${s + 1}"
+            device_name = "${var.gcp_resource_prefix}-roks-${host_storage.unique_host_id}"
+            disk_name = "${var.gcp_resource_prefix}-roks-${host_storage.unique_host_id}"
             disk_labels = {type = "forroks"}
           },{
             mode = "READ_WRITE"
@@ -40,18 +39,17 @@ locals {
             boot = false
             auto_delete = true
             # these device names need to be unique for GCP project in each zone
-            device_name = "${var.gcp_resource_prefix}-osd-host-${s + 1}"
-            disk_name = "${var.gcp_resource_prefix}-osd-host-${s + 1}"
+            device_name = "${var.gcp_resource_prefix}-osd-${host_storage.unique_host_id}"
+            disk_name = "${var.gcp_resource_prefix}-osd-${host_storage.unique_host_id}"
             disk_labels = {type = "osd"}
           }]
       }
       }, {
-      for j, host_addl in var.addl_hosts :
-      sum([j, length(var.cp_hosts), length(var.storage_hosts)]) => {
+      for host_addl in var.addl_hosts :
+      host_addl.unique_host_id => {
         instance_type     = host_addl.instance_type
-        count             = host_addl.count
+        count             = 1
         for_control_plane = false
-        # get the zone from the structure as this structure hard codes zone to work around host number being greater than 3
         zone              = host_addl.zone
         additional_disks = [{
             mode = "READ_WRITE"
@@ -61,8 +59,8 @@ locals {
             boot = false
             auto_delete = true
             # these device names need to be unique for GCP project in each zone
-            device_name = "${var.gcp_resource_prefix}-roks-host-${j + 1 + length(var.storage_hosts)}"
-            disk_name = "${var.gcp_resource_prefix}-roks-host-${j + 1 + length(var.storage_hosts)}"
+            device_name = "${var.gcp_resource_prefix}-roks-${host_addl.unique_host_id}"
+            disk_name = "${var.gcp_resource_prefix}-roks-${host_addl.unique_host_id}"
             disk_labels = {type = "forroks"}
         }]
       }

@@ -14,6 +14,9 @@ resource "tls_private_key" "rsa_key" {
 }
 
 module "gcp_host-template" {
+  #----------------------------------------------------------------------
+  # the hosts map is constructed in locals.tf and is used in many places
+  #----------------------------------------------------------------------
   for_each   = local.hosts
   source     = "terraform-google-modules/vm/google//modules/instance_template"
   version    = "6.5.0"
@@ -48,14 +51,27 @@ module "gcp_host-template" {
 }
 
 module "gcp_hosts" {
+  #----------------------------------------------------------------------
+  # the hosts map is constructed in locals.tf and is used in many places
+  #----------------------------------------------------------------------
   for_each           = local.hosts
   source             = "terraform-google-modules/vm/google//modules/compute_instance"
   version            = "7.9.0"
   region             = var.gcp_region
   network            = var.gcp_shared_network
   subnetwork         = var.gcp_subnet
+  #--------------------------------------
+  # this is set to 1 in locals.tf
+  #--------------------------------------
   num_instances      = each.value.count
-  hostname           = "${var.gcp_resource_prefix}-host-${each.key}"
+  hostname           = "${var.gcp_resource_prefix}-${each.key}"
   instance_template  = module.gcp_host-template[each.key].self_link
+  #------------------------------------
+  # sepcify each zone sepcifically
+  #------------------------------------
   zone               = each.value.zone
+  #---------------------------------
+  # Suppress GCP suffix on hostnames
+  #---------------------------------
+  add_hostname_suffix = false
 }
