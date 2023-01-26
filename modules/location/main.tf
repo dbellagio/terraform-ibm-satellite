@@ -56,9 +56,21 @@ data "ibm_satellite_attach_host_script" "script" {
     yum repolist all
     # yum install container-selinux -y
     yum install subscription-manager -y
+
+    #-----------------------
+    # Google needs this
+    #-----------------------
+    mkdir -p /etc/satellitemachineidgeneration
+    if [[ ! -f /etc/satellitemachineidgeneration/machineidgenerated ]]; then
+      echo
+      echo "Setting /etc/machine-id using: openssl rand -hex 16"
+      echo
+      openssl rand -hex 16 > /etc/machine-id
+      touch /etc/satellitemachineidgeneration/machineidgenerated
+    fi
   else
     echo
-    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user"
+    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user, and set machine-id"
     echo
   fi
   set -e

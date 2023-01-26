@@ -225,6 +225,12 @@ variable "location_bucket" {
   default     = ""
 }
 
+variable "ibm_region" {
+  description = "COS region in IBM cloud"
+  type        = string
+  default     = ""
+}
+
 variable "host_labels" {
   description = "Labels to add to attach host script"
   type        = list(string)

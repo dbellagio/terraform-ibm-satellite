@@ -14,9 +14,9 @@ variable "host_labels" {
   }
 }
 
-variable "location_zones" {
-  description = "Allocate your hosts across these three zones"
-  type        = list(string)
+variable "location_zone" {
+  description = "The zone to use for host assign"
+  type        = string
   default     = null
 }
 
@@ -29,7 +29,7 @@ variable "host_vms" {
 variable "host_count" {
   description = "The total number of ibm/aws host to create for control plane"
   type        = number
-  default     = 3
+  default     = 1
 
 }
 

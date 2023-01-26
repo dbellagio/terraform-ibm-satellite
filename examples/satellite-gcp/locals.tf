@@ -12,6 +12,7 @@ locals {
         for_control_plane = true
         additional_disks  = []
         zone              = host_cp.zone
+        additional_labels = ["host:cp"]
       }
       }, {
       for host_storage in var.storage_hosts :
@@ -20,6 +21,7 @@ locals {
         count             = 1
         for_control_plane = false
         zone              = host_storage.zone
+        additional_labels = ["host:st"]
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"
@@ -51,6 +53,7 @@ locals {
         count             = 1
         for_control_plane = false
         zone              = host_addl.zone
+        additional_labels = ["host:wk"]
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"

@@ -6,7 +6,8 @@ module "satellite-host" {
   host_count     = each.value.for_control_plane ? each.value.count : 0
   location       = module.satellite-location.location_id
   host_vms       = [for instance in module.gcp_hosts[each.key].instances_details : instance.name]
-  location_zones = var.location_zones
-  host_labels    = var.host_labels
+  location_zone  = each.value.zone
+#  location_zones = var.location_zones
+  host_labels    = (each.value.additional_labels != null ? concat(var.host_labels, each.value.additional_labels) : var.host_labels)
   host_provider  = "google"
 }
