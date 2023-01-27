@@ -1,9 +1,9 @@
 locals {
 
-  # combine cp_hosts and addl_hosts into a map so we can use for_each later
-  # support backwards compatibility with providing var.instance_type, satellite_host_count, and addl_host_count
-
-  # removed the backward compatibility code as it was more confusing and we are not using it
+  # combine cp_hosts, stoe_hosts, and aragddl_hosts into a map so we can use for_each later
+  # common stuff can go here for each host type
+  # unique host attributes should go in the variables file and referenced/added here
+ 
   hosts = merge({
       for host_cp in var.cp_hosts :
       host_cp.unique_host_id => {
@@ -12,7 +12,7 @@ locals {
         for_control_plane = true
         additional_disks  = []
         zone              = host_cp.zone
-        additional_labels = ["host:cp"]
+        attach_script     = host_cp.attach_script
       }
       }, {
       for host_storage in var.storage_hosts :
@@ -21,7 +21,7 @@ locals {
         count             = 1
         for_control_plane = false
         zone              = host_storage.zone
-        additional_labels = ["host:st"]
+        attach_script     = host_storage.attach_script
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"
@@ -53,7 +53,7 @@ locals {
         count             = 1
         for_control_plane = false
         zone              = host_addl.zone
-        additional_labels = ["host:wk"]
+        attach_script     = host_addl.attach_script
         additional_disks = [{
             mode = "READ_WRITE"
             disk_type = "pd-balanced"

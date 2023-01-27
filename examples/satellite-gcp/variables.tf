@@ -76,6 +76,7 @@ variable "cp_hosts" {
         instance_type  = string
         zone           = string
         unique_host_id = string
+        attach_script  = string
       }
     )
   )
@@ -113,6 +114,7 @@ variable "storage_hosts" {
         instance_type   = string
         zone            = string
         unique_host_id  = string
+        attach_script  = string
       }
     )
   )
@@ -150,6 +152,7 @@ variable "addl_hosts" {
         instance_type = string
         zone            = string
         unique_host_id  = string
+        attach_script  = string
       }
     )
   )

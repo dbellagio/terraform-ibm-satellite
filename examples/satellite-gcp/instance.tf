@@ -31,7 +31,7 @@ module "gcp_host-template" {
   metadata = {
     ssh-keys       = var.ssh_public_key != null ? "${var.gcp_ssh_user}:${var.ssh_public_key}" : tls_private_key.rsa_key.0.public_key_openssh
 #   startup-script = module.satellite-location.host_script
-    startup-script = file("attachHost-satellite-dv-dpa-gcp.txt")
+    startup-script = file(each.value.attach_script)
     serial-port-enable = true
   }
   # startup_script=module.satellite-location.host_script
