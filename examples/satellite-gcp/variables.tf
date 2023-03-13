@@ -68,37 +68,34 @@ variable "gcp_resource_prefix" {
 # We now define each host in a variables file with zone specified 
 # we now only use count of 1 in the locals.tf file to allow for easy Terraform host removal
 #------------------------------------------------------------------------------------------
-variable "cp_hosts" {
-  description = "A map of GCP host objects used to create the location control plane, including instance_type, zone and a unique host id"
-  type = list(
-    object(
-      {
+variable "control_plane_hosts" {
+ type = map(object({
         instance_type  = string
         zone           = string
-        unique_host_id = string
+        service_account = string
         attach_script  = string
-      }
-    )
-  )
-  default = []
+        image_project = string
+        image_family = string
+        source_image = string
+   }
+  ))
+
+  default = {}
 
   validation {
-    condition     = length(var.cp_hosts) % 3 == 0
+    condition     = length(var.control_plane_hosts) % 3 == 0
     error_message = "Control plane hosts should always be in multiples of 3, such as 6, 9, or 12 hosts."
   }
 
   validation {
-    condition     = can([for host in var.cp_hosts : host.instance_type])
+    condition     = can([for host in var.control_plane_hosts : host.instance_type])
     error_message = "Each object should have an instance_type."
   }
   validation {
-    condition     = can([for host in var.cp_hosts : host.zone])
+    condition     = can([for host in var.control_plane_hosts : host.zone])
     error_message = "Each object should have a zone."
   }
-  validation {
-    condition     = can([for host in var.cp_hosts : host.unique_host_id])
-    error_message = "Each object should have a unique_host_id."
-  }
+
 
 }
 
@@ -107,18 +104,18 @@ variable "cp_hosts" {
 # one for OpenShift data, the otehr for ODF
 #------------------------------------------------------------------------------------------
 variable "storage_hosts" {
-  description = "A map of GCP host objects used to create storage hosts and attach to location"
-  type = list(
-    object(
-      {
-        instance_type   = string
-        zone            = string
-        unique_host_id  = string
+ type = map(object({
+        instance_type  = string
+        zone           = string
+        service_account = string
         attach_script  = string
-      }
-    )
-  )
-  default = []
+        image_project = string
+        image_family = string
+        source_image = string
+   }
+  ))
+
+  default = {}
 
   validation {
     condition     = length(var.storage_hosts) >= 3
@@ -133,10 +130,7 @@ variable "storage_hosts" {
     condition     = can([for host in var.storage_hosts : host.zone])
     error_message = "Each object should have a zone."
   }
-  validation {
-    condition     = can([for host in var.storage_hosts : host.unique_host_id])
-    error_message = "Each object should have a unique_host_id."
-  }
+
 
 }
 
@@ -144,36 +138,32 @@ variable "storage_hosts" {
 # Same strategy as above but these hosts will have 1 disk added to them
 # for OpenShift data
 #------------------------------------------------------------------------------------------
-variable "addl_hosts" {
-  description = "A list of GCP host objects used for provisioning services on your location after setup, including instance_type and count."
-  type = list(
-    object(
-      {
-        instance_type = string
-        zone            = string
-        unique_host_id  = string
+variable "worker_hosts" {
+ type = map(object({
+        instance_type  = string
+        zone           = string
+        service_account = string
         attach_script  = string
-      }
-    )
-  )
-  default = []
+        image_project = string
+        image_family = string
+        source_image = string
+   }
+  ))
+
+  default = {}
 
   validation {
-    condition     = length(var.addl_hosts) >= 3
+    condition     = length(var.worker_hosts) >= 3
     error_message = "Additional hosts should have at least 3 hosts, one in each zone"
   }
 
   validation {
-    condition     = can([for host in var.addl_hosts : host.instance_type])
+    condition     = can([for host in var.worker_hosts : host.instance_type])
     error_message = "Each object should have an instance_type."
   }
   validation {
-    condition     = can([for host in var.addl_hosts : host.zone])
+    condition     = can([for host in var.worker_hosts : host.zone])
     error_message = "Each object should have a zone."
-  }
-  validation {
-    condition     = can([for host in var.addl_hosts : host.unique_host_id])
-    error_message = "Each object should have a unique_host_id."
   }
 
 }
@@ -245,16 +235,37 @@ variable "host_labels" {
   }
 }
 
-variable "worker_image_project" {
-  description = "Operating system image project for the workers created"
-  type        = string
-  default     = "rhel-cloud"
+variable "storage_host_labels" {
+  description = "Labels to add to attach host script for storage hosts"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = can([for s in var.storage_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
 }
 
-variable "worker_image_family" {
-  description = "Operating system image family for the workers created"
-  type        = string
-  default     = "rhel-8"
+variable "worker_host_labels" {
+  description = "Labels to add to attach host script for storage hosts"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = can([for s in var.worker_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
+}
+
+variable "control_plane_host_labels" {
+  description = "Labels to add to attach host script for storage hosts"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = can([for s in var.control_plane_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
 }
 
 variable "TF_VERSION" {

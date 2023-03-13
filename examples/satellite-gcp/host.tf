@@ -1,3 +1,4 @@
+/*
 module "satellite-host" {
   for_each = local.hosts
 
@@ -11,3 +12,4 @@ module "satellite-host" {
   host_labels    = (each.value.additional_labels != null ? concat(var.host_labels, each.value.additional_labels) : var.host_labels)
   host_provider  = "google"
 }
+*/
