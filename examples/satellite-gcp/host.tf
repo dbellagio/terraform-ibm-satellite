@@ -1,4 +1,7 @@
 /*
+
+We do not need this file anymore if using resources
+
 module "satellite-host" {
   for_each = local.hosts
 
