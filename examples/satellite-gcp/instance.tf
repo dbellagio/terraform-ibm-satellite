@@ -125,7 +125,7 @@ resource "google_compute_instance_template" "gcp_control_plane_host_template" {
 
   metadata = {
     ssh-keys       = var.ssh_public_key != null ? "${var.gcp_ssh_user}:${var.ssh_public_key}" : tls_private_key.rsa_key.0.public_key_openssh
-    startup-script = data.ibm_satellite_attach_host_script.attach_script_control_plane
+    startup-script = data.ibm_satellite_attach_host_script.attach_script_control_plane.host_script
 #    startup-script = file(each.value.attach_script)
     serial-port-enable = true
   }
@@ -187,7 +187,7 @@ resource "google_compute_instance_template" "gcp_worker_host_template" {
 
   metadata = {
     ssh-keys       = var.ssh_public_key != null ? "${var.gcp_ssh_user}:${var.ssh_public_key}" : tls_private_key.rsa_key.0.public_key_openssh
-    startup-script = data.ibm_satellite_attach_host_script.attach_script_worker
+    startup-script = data.ibm_satellite_attach_host_script.attach_script_worker.host_script
 #    startup-script = file(each.value.attach_script)
     serial-port-enable = true
   }
@@ -266,7 +266,7 @@ resource "google_compute_instance_template" "gcp_storage_host_template" {
 
   metadata = {
     ssh-keys       = var.ssh_public_key != null ? "${var.gcp_ssh_user}:${var.ssh_public_key}" : tls_private_key.rsa_key.0.public_key_openssh
-    startup-script = data.ibm_satellite_attach_host_script.attach_script_storage
+    startup-script = data.ibm_satellite_attach_host_script.attach_script_storage.host_script
 #    startup-script = file(each.value.attach_script)
     serial-port-enable = true
   }
@@ -424,31 +424,13 @@ resource "google_compute_instance_from_template" "gcp_worker_hosts" {
 
 }
 
-
-# Assign the control plane hosts to the location
-
-module "satellite-host" {
-  for_each = var.control_plane_hosts
-
-  depends_on     = [google_compute_instance_from_template.gcp_control_plane_hosts]
-  source         = "../../modules/host"
-  host_count     = 1
-  location       = module.satellite-location.location_id
-  host_vms       = [for instance in google_compute_instance_from_template.gcp_control_plane_hosts[each.key].instances_details : instance.name]
-  location_zone  = each.value.zone
-  host_labels    = (each.value.additional_labels != null ? concat(var.host_labels, each.value.additional_labels) : var.host_labels)
-  host_provider  = "google"
-}
-
-/*
 resource "ibm_satellite_host" "assign_host" {
   depends_on     = [google_compute_instance_from_template.gcp_control_plane_hosts]
   for_each       = var.control_plane_hosts
 
   location      = var.location
   host_id       = "${var.gcp_resource_prefix}-${each.key}"
-  labels        = (each.value.additional_labels != null ? concat(var.host_labels, each.value.additional_labels) : var.host_labels)
+  labels        = (var.control_plane_host_labels != null ? concat(var.host_labels, var.control_plane_host_labels) : var.host_labels)
   zone          = each.value.zone
   host_provider = "google"
 }
-*/
