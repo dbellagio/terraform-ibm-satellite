@@ -88,7 +88,7 @@ data "ibm_satellite_attach_host_script" "storage_script" {
   then
     echo "======================================================================================================================================="
     echo ""
-    echo "Using control plane attach_host script"
+    echo "Using storage attach_host script"
     echo ""
     echo "[$date] - Executing code to enable serial port, add a user to use to login to the host, add user to sshd_config and restart ssh service"
     echo "======================================================================================================================================="
@@ -140,7 +140,7 @@ data "ibm_satellite_attach_host_script" "worker_script" {
   then
     echo "======================================================================================================================================="
     echo ""
-    echo "Using control plane attach_host script"
+    echo "Using worker attach_host script"
     echo ""
     echo "[$date] - Executing code to enable serial port, add a user to use to login to the host, add user to sshd_config and restart ssh service"
     echo "======================================================================================================================================="
