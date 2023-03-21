@@ -48,6 +48,39 @@ variable "host_labels" {
   }
 }
 
+variable "control_plane_host_labels" {
+  description = "Labels to add to attach host script"
+  type        = list(string)
+  default     = null
+
+  validation {
+    condition     = can([for s in var.control_plane_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
+}
+
+variable "storage_host_labels" {
+  description = "Labels to add to attach host script"
+  type        = list(string)
+  default     = null
+
+  validation {
+    condition     = can([for s in var.storage_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
+}
+
+variable "worker_host_labels" {
+  description = "Labels to add to attach host script"
+  type        = list(string)
+  default     = null
+
+  validation {
+    condition     = can([for s in var.worker_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
+}
+
 variable "location_bucket" {
   description = "COS bucket name"
   default     = null

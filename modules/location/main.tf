@@ -21,9 +21,10 @@ data "ibm_satellite_location" "location" {
   depends_on = [ibm_satellite_location.create_location]
 }
 
-data "ibm_satellite_attach_host_script" "script" {
+data "ibm_satellite_attach_host_script" "control_plane_script" {
   location      = data.ibm_satellite_location.location.id
-  labels        = (var.host_labels != null ? var.host_labels : null)
+  labels        = (var.control_plane_host_labels != null ? concat(var.host_labels, var.control_plane_host_labels) : var.host_labels)
+
  # host_provider = var.host_provider
   custom_script = <<EOF
   set +e
@@ -33,9 +34,12 @@ data "ibm_satellite_attach_host_script" "script" {
   status=$?
   if [ $status -ne 0 ]
   then
-    echo
-    echo "[$date] - Executing code to enable serial port, add RHEL package updates, and add a user to use to login to the hosts"
-    echo
+    echo "======================================================================================================================================="
+    echo ""
+    echo "Using control plane attach_host script"
+    echo ""
+    echo "[$date] - Executing code to enable serial port, add a user to use to login to the host, add user to sshd_config and restart ssh service"
+    echo "======================================================================================================================================="
 
     # Turn on serial port and enable
     systemctl start serial-getty@ttyS1.service
@@ -47,30 +51,126 @@ data "ibm_satellite_attach_host_script" "script" {
     usermod -aG wheel user1
     usermod -aG google-sudoers user1
 
-    # move un-needed repos out of the way so yum commands do not fail
-    mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.BAK
-    mv /etc/yum.repos.d/epel-testing.repo /etc/yum.repos.d/epel-testing.repo.BAK
-    
-    # Enable GCP RHEL package updates
-    yum update --disablerepo=* --enablerepo="*" -y
-    yum repolist all
-    # yum install container-selinux -y
-    yum install subscription-manager -y
-
-    #-----------------------
-    # Google needs this
-    #-----------------------
-    mkdir -p /etc/satellitemachineidgeneration
-    if [[ ! -f /etc/satellitemachineidgeneration/machineidgenerated ]]; then
-      echo
-      echo "Setting /etc/machine-id using: openssl rand -hex 16"
-      echo
-      openssl rand -hex 16 > /etc/machine-id
-      touch /etc/satellitemachineidgeneration/machineidgenerated
+    if grep 'AllowUsers root' /etc/ssh/sshd_config
+    then
+        # this should change all lines in the /etc/ssh/sshd_config file to -> AllowUsers root user1
+        sed -i '' -e 's/AllowUsers root/AllowUsers root user1/g' /etc/ssh/sshd_config
+        echo
+        echo "[$date] - Restarting ssh.service"
+        echo
+        systemctl restart ssh.service
+    else
+        echo
+        echo "[$date] - Could not find AllowUsers root in file /etc/ssh/sshd_config"
+        echo
     fi
   else
     echo
-    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user, and set machine-id"
+    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user, and restart ssh service"
+    echo
+  fi
+  set -e
+EOF
+}
+
+data "ibm_satellite_attach_host_script" "storage_script" {
+  location      = data.ibm_satellite_location.location.id
+  labels        = (var.storage_host_labels != null ? concat(var.host_labels, var.storage_host_labels) : var.host_labels)
+
+ # host_provider = var.host_provider
+  custom_script = <<EOF
+  set +e
+  date=`date`
+
+  cmd=`grep user1 /etc/passwd`
+  status=$?
+  if [ $status -ne 0 ]
+  then
+    echo "======================================================================================================================================="
+    echo ""
+    echo "Using control plane attach_host script"
+    echo ""
+    echo "[$date] - Executing code to enable serial port, add a user to use to login to the host, add user to sshd_config and restart ssh service"
+    echo "======================================================================================================================================="
+
+    # Turn on serial port and enable
+    systemctl start serial-getty@ttyS1.service
+    systemctl enable serial-getty@ttyS1.service
+
+    # Add user to login to host as (change password if needed)
+    useradd -m user1
+    echo passw0rd | passwd user1 --stdin
+    usermod -aG wheel user1
+    usermod -aG google-sudoers user1
+
+    if grep 'AllowUsers root' /etc/ssh/sshd_config
+    then
+        # this should change all lines in the /etc/ssh/sshd_config file to -> AllowUsers root user1
+        sed -i '' -e 's/AllowUsers root/AllowUsers root user1/g' /etc/ssh/sshd_config
+        echo
+        echo "[$date] - Restarting ssh.service"
+        echo
+        systemctl restart ssh.service
+    else
+        echo
+        echo "[$date] - Could not find AllowUsers root in file /etc/ssh/sshd_config"
+        echo
+    fi
+  else
+    echo
+    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user, and restart ssh service"
+    echo
+  fi
+  set -e
+EOF
+}
+
+data "ibm_satellite_attach_host_script" "worker_script" {
+  location      = data.ibm_satellite_location.location.id
+  labels        = (var.worker_host_labels != null ? concat(var.host_labels, var.worker_host_labels) : var.host_labels)
+
+ # host_provider = var.host_provider
+  custom_script = <<EOF
+  set +e
+  date=`date`
+
+  cmd=`grep user1 /etc/passwd`
+  status=$?
+  if [ $status -ne 0 ]
+  then
+    echo "======================================================================================================================================="
+    echo ""
+    echo "Using control plane attach_host script"
+    echo ""
+    echo "[$date] - Executing code to enable serial port, add a user to use to login to the host, add user to sshd_config and restart ssh service"
+    echo "======================================================================================================================================="
+
+    # Turn on serial port and enable
+    systemctl start serial-getty@ttyS1.service
+    systemctl enable serial-getty@ttyS1.service
+
+    # Add user to login to host as (change password if needed)
+    useradd -m user1
+    echo passw0rd | passwd user1 --stdin
+    usermod -aG wheel user1
+    usermod -aG google-sudoers user1
+
+    if grep 'AllowUsers root' /etc/ssh/sshd_config
+    then
+        # this should change all lines in the /etc/ssh/sshd_config file to -> AllowUsers root user1
+        sed -i '' -e 's/AllowUsers root/AllowUsers root user1/g' /etc/ssh/sshd_config
+        echo
+        echo "[$date] - Restarting ssh.service"
+        echo
+        systemctl restart ssh.service
+    else
+        echo
+        echo "[$date] - Could not find AllowUsers root in file /etc/ssh/sshd_config"
+        echo
+    fi
+  else
+    echo
+    echo "[$date] - Already executed commands to enable serial port, add RHEL subscription, and add a user, and restart ssh service"
     echo
   fi
   set -e

@@ -29,6 +29,9 @@ module "satellite-location" {
   managed_from      = var.managed_from
   location_zones    = var.location_zones
   host_labels       = var.host_labels
+  control_plane_host_labels = var.control_plane_host_labels
+  storage_host_labels       = var.storage_host_labels
+  worker_host_labels        = var.worker_host_labels 
   resource_group    = var.ibm_resource_group
   host_provider     = "google"
   location_bucket   = ibm_cos_bucket.location_cos_bucket.bucket_name
