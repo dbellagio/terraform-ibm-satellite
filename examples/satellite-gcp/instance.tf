@@ -178,7 +178,7 @@ resource "google_compute_instance_template" "gcp_worker_host_template" {
     ignore_changes = [
       # Ignore changes to tags, e.g. because a management agent
       # updates these based on some ruleset managed elsewhere.
-      metadata.startup_script,
+      metadata.startup-script,
     ]
   }
 
@@ -272,7 +272,7 @@ resource "google_compute_instance_template" "gcp_storage_host_template" {
     ignore_changes = [
       # Ignore changes to tags, e.g. because a management agent
       # updates these based on some ruleset managed elsewhere.
-      metadata.startup_script,
+      metadata.startup-script,
     ]
   }
 
