@@ -99,7 +99,7 @@ resource "google_compute_instance_template" "gcp_control_plane_host_template" {
     ignore_changes = [
       # Ignore changes to tags, e.g. because a management agent
       # updates these based on some ruleset managed elsewhere.
-      metadata.startup_script,
+      metadata.startup-script,
     ]
   }
 
