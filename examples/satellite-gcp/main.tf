@@ -32,6 +32,7 @@ module "satellite-location" {
   control_plane_host_labels = var.control_plane_host_labels
   storage_host_labels       = var.storage_host_labels
   worker_host_labels        = var.worker_host_labels 
+  debug_host_labels        = var.debug_host_labels 
   resource_group    = var.ibm_resource_group
   host_provider     = "google"
   location_bucket   = ibm_cos_bucket.location_cos_bucket.bucket_name

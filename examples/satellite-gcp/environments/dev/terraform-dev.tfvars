@@ -45,6 +45,7 @@ host_labels = ["env:dev","tech:was"]
 storage_host_labels = ["type:storage"]
 worker_host_labels = ["type:worker"]
 control_plane_host_labels = ["type:cp"]
+debug_host_labels = ["type:debug"]
 
 #---------------------------------
 # Size of ODF storage disk to add
@@ -64,7 +65,6 @@ control_plane_hosts = {
      instance_type   = "n2-standard-4"
       zone            = "us-central1-a"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -76,7 +76,6 @@ control_plane_hosts = {
       instance_type   = "n2-standard-4"
       zone            = "us-central1-a"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -91,7 +90,6 @@ control_plane_hosts = {
       instance_type   = "n2-standard-4"
       zone            = "us-central1-b"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -103,7 +101,6 @@ control_plane_hosts = {
       instance_type   = "n2-standard-4"
       zone            = "us-central1-b"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -118,7 +115,6 @@ control_plane_hosts = {
       instance_type   = "n2-standard-4"
       zone            = "us-central1-c"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -130,7 +126,6 @@ control_plane_hosts = {
       instance_type   = "n2-standard-4"
       zone            = "us-central1-c"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-cp-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -153,7 +148,6 @@ storage_hosts = {
       instance_type   = "n2-standard-16"
       zone            = "us-central1-a"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-st-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -168,7 +162,6 @@ storage_hosts = {
       instance_type   = "n2-standard-16"
       zone            = "us-central1-b"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-st-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -183,7 +176,6 @@ storage_hosts = {
       instance_type   = "n2-standard-16"
       zone            = "us-central1-c"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-st-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -205,7 +197,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-a"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -217,7 +208,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-a"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -232,7 +222,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-b"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -244,7 +233,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-b"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -259,7 +247,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-c"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------
@@ -271,7 +258,6 @@ worker_hosts = {
       instance_type   = "n2-standard-8"
       zone            = "us-central1-c"
       service_account = "project_sa@gmail.com"
-      attach_script   = "./environments/dev/attachHost-wk-sat-dev-gcp.txt"
       #---------------------------------
       # OS to load on the hosts
       #---------------------------------

@@ -73,7 +73,6 @@ variable "control_plane_hosts" {
         instance_type  = string
         zone           = string
         service_account = string
-        attach_script  = string
         image_project = string
         image_family = string
         source_image = string
@@ -108,7 +107,6 @@ variable "storage_hosts" {
         instance_type  = string
         zone           = string
         service_account = string
-        attach_script  = string
         image_project = string
         image_family = string
         source_image = string
@@ -143,7 +141,6 @@ variable "worker_hosts" {
         instance_type  = string
         zone           = string
         service_account = string
-        attach_script  = string
         image_project = string
         image_family = string
         source_image = string
@@ -163,6 +160,34 @@ variable "worker_hosts" {
   }
   validation {
     condition     = can([for host in var.worker_hosts : host.zone])
+    error_message = "Each object should have a zone."
+  }
+
+}
+
+#------------------------------------------------------------------------------------------
+# Same strategy as above but these hosts will have 1 disk added to them
+# for OpenShift data
+#------------------------------------------------------------------------------------------
+variable "debug_hosts" {
+ type = map(object({
+        instance_type  = string
+        zone           = string
+        service_account = string
+        image_project = string
+        image_family = string
+        source_image = string
+   }
+  ))
+
+  default = {}
+
+  validation {
+    condition     = can([for host in var.debug_hosts : host.instance_type])
+    error_message = "Each object should have an instance_type."
+  }
+  validation {
+    condition     = can([for host in var.debug_hosts : host.zone])
     error_message = "Each object should have a zone."
   }
 
@@ -267,6 +292,18 @@ variable "control_plane_host_labels" {
     error_message = "Label must be of the form `key:value`."
   }
 }
+
+variable "debug_host_labels" {
+  description = "Labels to add to attach host script for debug hosts"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = can([for s in var.debug_host_labels : regex("^[a-zA-Z0-9:]+$", s)])
+    error_message = "Label must be of the form `key:value`."
+  }
+}
+
 
 variable "TF_VERSION" {
   description = "Terraform version"

@@ -14,3 +14,7 @@ output "worker_script" {
 output "storage_script" {
   value = data.ibm_satellite_attach_host_script.storage_script.host_script
 }
+
+output "debug_script" {
+  value = data.ibm_satellite_attach_host_script.debug_script.host_script
+}
