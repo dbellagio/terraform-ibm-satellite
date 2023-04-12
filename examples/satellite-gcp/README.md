@@ -1,3 +1,9 @@
+# This forked repo has been heavily modified to fix bugs and work with Day 2 activities
+
+The documentation below is no longer valid for this fork.  This has been refactored to use resources
+instead of the modules in some places.  The variables file has been formatted to deal with adding/removing hosts easily
+without destruction of other hosts
+
 # satellite-google
 
 Use this terrafrom automation to set up satellite location on IBM cloud with Google host.
