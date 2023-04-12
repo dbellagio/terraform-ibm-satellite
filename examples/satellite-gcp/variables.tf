@@ -66,7 +66,6 @@ variable "gcp_resource_prefix" {
 #------------------------------------------------------------------------------------------
 # There is a bug with Google zones if zone is left null and count was more than 3  
 # We now define each host in a variables file with zone specified 
-# we now only use count of 1 in the locals.tf file to allow for easy Terraform host removal
 #------------------------------------------------------------------------------------------
 variable "control_plane_hosts" {
  type = map(object({

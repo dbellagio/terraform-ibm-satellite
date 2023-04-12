@@ -20,9 +20,6 @@ resource "google_compute_instance_template" "gcp_control_plane_host_template" {
   description = "Each template is used to create a host, we could change this later to have a template for worker, storage, control plane"
   instance_description = "The GCP host: either be a worker, storage, or control plane"
 
-  #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
-  #----------------------------------------------------------------------
   project      = var.gcp_project
 
   network_interface {
@@ -79,9 +76,6 @@ resource "google_compute_instance_template" "gcp_worker_host_template" {
   description = "Each template is used to create a host, we could change this later to have a template for worker, storage, control plane"
   instance_description = "The GCP host: either be a worker, storage, or control plane"
 
-  #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
-  #----------------------------------------------------------------------
   project      = var.gcp_project
 
   network_interface {
@@ -155,9 +149,6 @@ resource "google_compute_instance_template" "gcp_storage_host_template" {
   description = "Each template is used to create a host, we could change this later to have a template for worker, storage, control plane"
   instance_description = "The GCP host: either be a worker, storage, or control plane"
 
-  #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
-  #----------------------------------------------------------------------
   project      = var.gcp_project
 
   network_interface {
@@ -242,14 +233,11 @@ resource "google_compute_instance_template" "gcp_storage_host_template" {
 resource "google_compute_instance_from_template" "gcp_control_plane_hosts" {
 
   #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
+  # Control Plan Hosts
   #----------------------------------------------------------------------
   for_each           = var.control_plane_hosts
   name = "${var.gcp_resource_prefix}-${each.key}"
  
-  #--------------------------------------
-  # this is set to 1 in locals.tf
-  #--------------------------------------
   source_instance_template  = google_compute_instance_template.gcp_control_plane_host_template[each.key].id
 
   #------------------------------------
@@ -262,14 +250,11 @@ resource "google_compute_instance_from_template" "gcp_control_plane_hosts" {
 resource "google_compute_instance_from_template" "gcp_storage_hosts" {
 
   #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
+  # Storage Hosts
   #----------------------------------------------------------------------
   for_each           = var.storage_hosts
   name = "${var.gcp_resource_prefix}-${each.key}"
  
-  #--------------------------------------
-  # this is set to 1 in locals.tf
-  #--------------------------------------
   source_instance_template  = google_compute_instance_template.gcp_storage_host_template[each.key].id
   
   #------------------------------------
@@ -282,14 +267,11 @@ resource "google_compute_instance_from_template" "gcp_storage_hosts" {
 resource "google_compute_instance_from_template" "gcp_worker_hosts" {
 
   #----------------------------------------------------------------------
-  # the hosts map is constructed in locals.tf and is used in many places
+  # Worker Hosts
   #----------------------------------------------------------------------
   for_each           = var.worker_hosts
   name = "${var.gcp_resource_prefix}-${each.key}"
  
-  #--------------------------------------
-  # this is set to 1 in locals.tf
-  #--------------------------------------
   source_instance_template  = google_compute_instance_template.gcp_worker_host_template[each.key].id
   
   #------------------------------------
@@ -300,6 +282,11 @@ resource "google_compute_instance_from_template" "gcp_worker_hosts" {
 }
 
 resource "ibm_satellite_host" "assign_host" {
+
+  #--------------------------------------------------------------------------------------
+  # Only assign the control plane hosts, other hosts get assigned during cluster creation
+  #--------------------------------------------------------------------------------------
+
   depends_on     = [google_compute_instance_from_template.gcp_control_plane_hosts]
   for_each       = var.control_plane_hosts
 
