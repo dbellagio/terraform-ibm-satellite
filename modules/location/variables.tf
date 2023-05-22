@@ -26,6 +26,11 @@ variable "is_location_exist" {
   default     = false
 }
 
+variable "coreos_enabled" {
+  description = "Determines if the coreos should be enabled on the satellite servers. This does not set the operating system to coreos."
+  type        = bool
+}
+
 variable "managed_from" {
   description = "The IBM Cloud region to manage your Satellite location from. Choose a region close to your on-prem data center for better performance."
   type        = string

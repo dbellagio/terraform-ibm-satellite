@@ -6,6 +6,7 @@ resource "ibm_satellite_location" "create_location" {
   count = var.is_location_exist == false ? 1 : 0
 
   location          = var.location
+  coreos_enabled    = var.coreos_enabled
   managed_from      = var.managed_from
   zones             = (var.location_zones != null ? var.location_zones : null)
   resource_group_id = data.ibm_resource_group.res_group.id
@@ -25,7 +26,7 @@ data "ibm_satellite_attach_host_script" "control_plane_script" {
   location      = data.ibm_satellite_location.location.id
   labels        = (var.control_plane_host_labels != null ? concat(var.host_labels, var.control_plane_host_labels) : var.host_labels)
 
- # host_provider = var.host_provider
+  #host_provider = var.host_provider
   custom_script = <<EOF
 EOF
 }
@@ -34,7 +35,7 @@ data "ibm_satellite_attach_host_script" "storage_script" {
   location      = data.ibm_satellite_location.location.id
   labels        = (var.storage_host_labels != null ? concat(var.host_labels, var.storage_host_labels) : var.host_labels)
 
- # host_provider = var.host_provider
+  # host_provider = var.host_provider
   custom_script = <<EOF
 EOF
 }
@@ -43,7 +44,7 @@ data "ibm_satellite_attach_host_script" "worker_script" {
   location      = data.ibm_satellite_location.location.id
   labels        = (var.worker_host_labels != null ? concat(var.host_labels, var.worker_host_labels) : var.host_labels)
 
- # host_provider = var.host_provider
+  # host_provider = var.host_provider
   custom_script = <<EOF
 EOF
 }
@@ -52,7 +53,7 @@ data "ibm_satellite_attach_host_script" "debug_script" {
   location      = data.ibm_satellite_location.location.id
   labels        = (var.debug_host_labels != null ? concat(var.host_labels, var.debug_host_labels) : var.host_labels)
 
- # host_provider = var.host_provider
+  # host_provider = var.host_provider
   custom_script = <<EOF
   set +e
   date=`date`
@@ -80,18 +81,20 @@ data "ibm_satellite_attach_host_script" "debug_script" {
 
     if grep 'AllowUsers root' /etc/ssh/sshd_config
     then
-        # this should change all lines in the /etc/ssh/sshd_config file to -> AllowUsers root user1
-        sed -i '' -e 's/AllowUsers root/AllowUsers root user1/g' /etc/ssh/sshd_config
-        echo
-        echo "[$date] - Restarting ssh.service"
-        echo
-        systemctl restart sshd
+      # this should change all lines in the /etc/ssh/sshd_config file to -> AllowUsers root user1
+      sed -i '' -e 's/AllowUsers root/AllowUsers root user1/g' /etc/ssh/sshd_config
+      echo
+      echo "[$date] - Restarting ssh.service"
+      echo
+      systemctl restart sshd
     else
-        echo
-        echo "[$date] - Could not find AllowUsers root in file /etc/ssh/sshd_config, adding user1 to end of file and restarting service"
-        echo
-        echo "AllowUsers user1" >> /etc/ssh/sshd_config
-        systemctl restart sshd      
+      echo
+      echo "[$date] - Could not find AllowUsers root in file /etc/ssh/sshd_config. Adding user1 to Allow users."
+      #cat /etc/ssh/sshd_config
+      echo "AllowUsers user1" >> /etc/ssh/sshd_config
+      #cat /etc/ssh/sshd_config
+      echo "[$date] - Restarting sshd"
+      systemctl restart sshd
     fi
   else
     echo

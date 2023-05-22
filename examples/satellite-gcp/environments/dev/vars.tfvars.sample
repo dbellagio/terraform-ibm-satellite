@@ -1,0 +1,277 @@
+#---------------------------------
+# IBMCloud variables for dv environment
+#---------------------------------
+ibmcloud_api_key = "<insert your IBM Cloud API Key>"
+ibm_resource_group = "<insert your IBM Cloud Resource Group>"
+
+#---------------------------------
+# Google Cloud variables for dv environment
+#---------------------------------
+gcp_credentials = "./serviceKey.json"
+gcp_project = "<insert your GCP Project>"
+gcp_resource_prefix = "<insert your GCP Resource prefix>"
+
+#----------------------------
+# Satellite location region map
+#----------------------------
+ibm_satellite_regions = {
+  dal = {
+    location = "<insert your IBM Cloud Satellite location string>"
+    is_location_exist = false
+    location_zones = ["us-central1-a", "us-central1-b", "us-central1-c"]
+    location_bucket = "<insert your IBM Cloud Satellite location bucket name>"
+    cos_bucket_region = "us-south"
+    satellite_core_os_enabled = true
+  },
+  #wdc = {
+  #  location = "<insert your IBM Cloud Satellite location string>"
+  #  is_location_exist = false
+  #  location_zones = ["us-east4-a", "us-east4-b", "us-east4-c"]
+  #  location_bucket = "<insert your IBM Cloud Satellite location bucket name>"
+  #  cos_bucket_region = "us-east"
+  #  satellite_core_os_enabled = true
+  #}
+}
+
+#------------------------------------------------------------------------
+# Custom host labels to apply on the Satellite hosts that are created
+# in addition to the auto-applied lablels (cpu, mem, os)
+#------------------------------------------------------------------------
+host_labels = ["env:dv", "tech:dpa"]
+storage_host_labels = ["type:storage"]
+worker_host_labels = ["type:worker"]
+control_plane_host_labels = ["type:cp"]
+debug_host_labels = ["type:debug"]
+
+# Note: For host images, if source_image is present, image_family is technically not needed by the provider. If source_image is not present, image_family is required. Provider Code Example:
+# source_image = var.source_image != "" ? format("${local.source_image_project}/${local.source_image}") : format("${local.source_image_project}/${local.source_image_family}")
+# You can set source_image = "" and set image_family to pull the latest.
+
+#---------------------------------
+# Control plane hosts
+# No added disks on these hosts
+#---------------------------------
+control_plane_hosts = {
+  cp-c1-000 = {
+    #-------------------
+    # Zone us-central1-a
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-a"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  cp-c1-001 = {
+    #-------------------
+    # Zone us-central1-b
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-b"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  cp-c1-002 = {
+    #-------------------
+    # Zone us-central1-c
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-c"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  cp-c1-003 = {
+    #-------------------
+    # Zone us-central1-a
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-a"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  cp-c1-004 = {
+    #-------------------
+    # Zone us-central1-b
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-b"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  cp-c1-005 = {
+    #-------------------
+    # Zone us-central1-c
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-4"
+    zone            = "us-central1-c"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  }
+}
+
+#---------------------------------
+# Size of ODF storage disk to add
+# to storage hosts
+#---------------------------------
+worker_odf_disk_size = 1800
+
+#---------------------------------
+# Storage hosts
+# Will have OCP data disk added 
+# and ODF storage disk added
+#---------------------------------
+storage_hosts = {
+  st-c1-100 = {
+    #-------------------
+    # Zone us-central1-a
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-16"
+    zone            = "us-central1-a"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  st-c1-101 = {
+    #-------------------
+    # Zone us-central1-b
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-16"
+    zone            = "us-central1-b"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  st-c1-102 = {
+    #-------------------
+    # Zone us-central1-c
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-16"
+    zone            = "us-central1-c"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  }
+}
+
+#---------------------------------
+# Worker hosts
+# Will have OCP data disk added
+#---------------------------------
+worker_hosts = {
+  wk-c1-200 = {
+    #-------------------
+    # Zone us-central1-a
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-8"
+    zone            = "us-central1-a"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  wk-c1-201 = {
+    #-------------------
+    # Zone us-central1-b
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-8"
+    zone            = "us-central1-b"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  },
+  wk-c1-202 = {
+    #-------------------
+    # Zone us-central1-c
+    #-------------------
+    managed_from    = "dal"
+    instance_type   = "n2-standard-8"
+    zone            = "us-central1-c"
+    gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+    gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+    sa_email = "<gcp-service-account-name-email>"
+    image_project = "pkr-dev-8201"
+    image_family = "rhel8-cldpk"
+    source_image = "rhel8-cldpk-202303081656"
+    serial_port_enabled = "false"
+  }
+}
+
+debug_hosts = {
+  #debug-c1-000 = {
+  #  #-------------------
+  #  # Zone us-central1-a
+  #  #-------------------
+  #  managed_from    = "dal"
+  #  instance_type   = "n2-standard-4"    # Instance type that matches control plane
+  #  #instance_type   = "n2-standard-16"  # Instance type that matches storage
+  #  #instance_type   = "n2-standard-8"   # Instance type that matches worker
+  #  zone            = "us-central1-a"
+  #  gcp_shared_network = "projects/<gcp-shared-project-name>/global/networks/<gcp-network-name>"
+  #  gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-control-planes>"
+  #  gcp_subnet = "projects/<gcp-shared-project-name>/regions/us-central1/subnetworks/<gcp-subnet-name-for-workers>"
+  #  sa_email = "<gcp-service-account-name-email>"
+  #  image_project = "pkr-dev-8201"
+  #  image_family = "rhel8-cldpk"
+  #  source_image = "rhel8-cldpk-202303081656"
+  #  serial_port_enabled = "true"
+  #}
+}

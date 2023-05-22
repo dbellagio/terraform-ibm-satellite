@@ -1,2 +1,3 @@
 *.prop
 variables.tfvars
+serviceKey.json
