@@ -24,7 +24,7 @@ resource "ibm_cos_bucket" "location_cos_bucket_region" {
 
 module "satellite-location-region" {
   depends_on                = [ibm_cos_bucket.location_cos_bucket_region]
-  source                    = "./modules/location"
+  source                    = "../../modules/location"
   for_each                  = var.ibm_satellite_regions
 
   is_location_exist         = each.value.is_location_exist
@@ -37,7 +37,7 @@ module "satellite-location-region" {
   storage_host_labels       = var.storage_host_labels
   worker_host_labels        = var.worker_host_labels 
   debug_host_labels         = var.debug_host_labels 
-  resource_group            = ibm_resource_group.sat_location_group.name
+  resource_group            = ibm_resource_group.sat_location_group.id
   host_provider             = "google"
   location_bucket           = each.value.location_bucket
   ibm_region                = each.value.cos_bucket_region

@@ -3,7 +3,7 @@
 #################################################################################################
 
 variable "resource_group" {
-  description = "Name of the resource group on which location has to be created"
+  description = "The resource group ID (not the name) on which location has to be created"
 }
 
 variable "ibm_region" {

@@ -1,6 +1,7 @@
-data "ibm_resource_group" "res_group" {
-  name = var.resource_group
-}
+# Not using this fetch anymore as in some cases during refresh this was causing errors during a plan
+#data "ibm_resource_group" "res_group" {
+#  name = var.resource_group
+#}
 
 resource "ibm_satellite_location" "create_location" {
   count = var.is_location_exist == false ? 1 : 0
@@ -9,7 +10,8 @@ resource "ibm_satellite_location" "create_location" {
   coreos_enabled    = var.coreos_enabled
   managed_from      = var.managed_from
   zones             = (var.location_zones != null ? var.location_zones : null)
-  resource_group_id = data.ibm_resource_group.res_group.id
+#  resource_group_id = data.ibm_resource_group.res_group.id
+  resource_group_id = var.resource_group
 
   cos_config {
     bucket = (var.location_bucket != null ? var.location_bucket : null)
